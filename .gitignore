@@ -7,7 +7,7 @@
 /build
 /captures
 .externalNativeBuild
-.idea/sonarlint/
+/Sources/WiFiTracker/.idea/sonarlint
 
 ### Android ###
 # Built application files
