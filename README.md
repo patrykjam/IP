@@ -1,2 +1,2 @@
 # IP
-Individual Project Subject
+Project for Indidual Project subject
