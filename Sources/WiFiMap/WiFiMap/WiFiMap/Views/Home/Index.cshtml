@@ -1,31 +1,62 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "WiFiMap";
 }
+<input id="pac-input" class="controls" type="text" placeholder="Search Box">
+<div id="map"></div>
+<script>
+    var map;
+    var citymap = {
+        mock1: {
+            center: { lat: 50.027524, lng: 19.905225 },
+            range: 25
+        },
+        mock2: {
+            center: { lat: 50.030412, lng: 19.907435 },
+            range: 100
+        }
+    };
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
+    function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: { lat: 50.027524, lng: 19.905225 },
+            zoom: 16
+        });
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
-</div>
+        // Create the search box and link it to the UI element.
+        var input = document.getElementById('pac-input');
+        var searchBox = new google.maps.places.SearchBox(input);
+        map.controls[google.maps.ControlPosition.TOP].push(input);
+
+        for (var city in citymap) {
+            // Add the circle for this city to the map.
+            var cityCircle = new google.maps.Circle({
+                strokeColor: '#FF0000',
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: '#FF0000',
+                fillOpacity: 0.35,
+                map: map,
+                center: citymap[city].center,
+                radius: citymap[city].range,
+                title: 'WiFi'
+            });
+            var contentString = '<div id="content">' +
+                '<h1 id="firstHeading" class="firstHeading">WIFI</h1>' +
+                '<div id="bodyContent">' +
+                'WiFi info:<br>' +
+                'INFO<br>' + 'INFO<br>' + 'INFO<br>' +
+                '</div>' +
+                '</div>';
+
+            var infowindow = new google.maps.InfoWindow({
+                content: contentString
+            });
+
+            google.maps.event.addListener(cityCircle, 'click', function (ev) {
+                infowindow.setPosition(ev.latLng); //<-- ev matches what you put ^ (mouse event)
+                infowindow.open(map);
+            });
+        }
+    }
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBa-8oJW9pe46Dx_zXrT1zsWnB-1w7Wszs&libraries=places&callback=initMap" async defer></script>
