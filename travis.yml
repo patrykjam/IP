@@ -1,0 +1,12 @@
+build_server:
+    language: csharp
+    solution: WiFiServer.sln
+
+build_map:
+    language: csharp
+    solution: WiFiMap.sln
+
+build_tracker:
+    script:
+        - cd Sources/WiFiTracker
+        - ./gradlew build
