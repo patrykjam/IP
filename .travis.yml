@@ -1,3 +1,5 @@
+language:csharp
+
 build_server:
     language: csharp
     solution: WiFiServer.sln
