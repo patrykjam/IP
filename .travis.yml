@@ -1,8 +1,8 @@
 language: csharp
 script:
-    -cd Sources/WiFiServer
+    - cd Sources/WiFiServer
     - nuget restore WiFiServer.sln
-    -cd ../WiFiMap
+    - cd ../WiFiMap
     - nuget restore WiFiMap.sln
-    -cd ../WiFiTracker
+    - cd ../WiFiTracker
     - ./gradlew build
