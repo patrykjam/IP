@@ -7,13 +7,14 @@
     tools:context="ip.edu.uj.wifitracker.MainActivity">
 
     <ToggleButton
-        android:id="@+id/toggleButton2"
+        android:id="@+id/toggleTrackingButton"
         android:layout_width="wrap_content"
         android:layout_height="92dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:onClick="trackingClicked"
         android:text="ToggleButton"
         android:textOff="Start tracking wireless networks"
         android:textOn="Stop tracking wireless networks"
