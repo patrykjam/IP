@@ -1,4 +1,4 @@
-language:csharp
+language: csharp
 
 build_server:
     language: csharp
