@@ -1,14 +1,8 @@
 language: csharp
-
-build_server:
-    language: csharp
-    solution: WiFiServer.sln
-
-build_map:
-    language: csharp
-    solution: WiFiMap.sln
-
-build_tracker:
-    script:
-        - cd Sources/WiFiTracker
-        - ./gradlew build
+script:
+    -cd Sources/WiFiServer
+    - nuget restore WiFiServer.sln
+    -cd ../WiFiMap
+    - nuget restore WiFiMap.sln
+    -cd ../WiFiTracker
+    - ./gradlew build
