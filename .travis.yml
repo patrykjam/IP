@@ -1,8 +1,7 @@
 language: csharp
-script:
-    - cd Sources/WiFiServer
-    - nuget restore WiFiServer.sln
-    - cd ../WiFiMap
-    - nuget restore WiFiMap.sln
-    - cd ../WiFiTracker
-    - ./gradlew build
+jobs:
+  include:
+    - stage: build
+    - script: nuget restore Sources/WiFiServer/WiFiServer.sln
+    - script: nuget restore Sources/WiFiMap/WiFiMap.sln
+script: ls
