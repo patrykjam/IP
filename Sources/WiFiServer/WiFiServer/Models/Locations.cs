@@ -1,9 +1,26 @@
-﻿namespace WiFiServer.Models
+namespace WiFiServer.Models
 {
-    public class Locations
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
+    using System.Data.Entity.Spatial;
+
+    public partial class LOCATIONS
     {
-        private int Id;
-        private double Longitude;
-        private double Latitude;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public LOCATIONS()
+        {
+            WIFI_DATA = new HashSet<WIFI_DATA>();
+        }
+
+        public int ID { get; set; }
+
+        public double LONGITUDE { get; set; }
+
+        public double LATITUDE { get; set; }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<WIFI_DATA> WIFI_DATA { get; set; }
     }
 }

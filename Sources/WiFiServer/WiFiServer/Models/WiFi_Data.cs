@@ -1,13 +1,39 @@
-﻿namespace WiFiServer.Models
+namespace WiFiServer.Models
 {
-    public class WiFi_Data
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
+    using System.ComponentModel.DataAnnotations.Schema;
+    using System.Data.Entity.Spatial;
+
+    public partial class WIFI_DATA
     {
-        private int Id;
-        private int WiFi_Date;
-        private int WiFi_Location;
-        private int Device;
-        private int SSID;
-        private int Auth_Type;
-        private int RSSI;
+        public int ID { get; set; }
+
+        public int WIFI_DATE { get; set; }
+
+        public int WIFI_LOCATION { get; set; }
+
+        public int DEVICE { get; set; }
+
+        public int BSSID { get; set; }
+
+        public int AUTH_TYPE { get; set; }
+
+        public int RSSI { get; set; }
+
+        public int SSID { get; set; }
+
+        public virtual AUTH_TYPES AUTH_TYPES { get; set; }
+
+        public virtual BSSIDS BSSIDS { get; set; }
+
+        public virtual DATES DATES { get; set; }
+
+        public virtual DEVICES DEVICES { get; set; }
+
+        public virtual LOCATIONS LOCATIONS { get; set; }
+
+        public virtual SSIDS SSIDS { get; set; }
     }
 }
