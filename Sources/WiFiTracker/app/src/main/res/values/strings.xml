@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">WiFiTracker</string>
+    <string name="sharedPrefsName">wifiTrackerData</string>
+    <string name="appRunning">running</string>
+    <string name="LogIdentificator">TRACKER</string>
+    <string name="AppIdentificator">TRACKER</string>
 </resources>
