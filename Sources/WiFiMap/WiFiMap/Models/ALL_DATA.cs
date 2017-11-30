@@ -1,10 +1,10 @@
-namespace WiFiServer.Models
-{
-    using System;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-    public partial class ALL_DATA
+namespace WiFiMap.Models
+{
+    public class ALL_DATA
     {
         public DateTime? WIFI_DATE { get; set; }
 

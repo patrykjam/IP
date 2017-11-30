@@ -1,8 +1,8 @@
 using System.Data.Entity;
 
-namespace WiFiServer.Models
+namespace WiFiMap.Models
 {
-    public partial class WiFiDbModel : DbContext
+    public class WiFiDbModel : DbContext
     {
         public WiFiDbModel()
             : base("name=WiFiDbModel")

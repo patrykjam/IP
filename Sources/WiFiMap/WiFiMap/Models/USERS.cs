@@ -1,8 +1,8 @@
-namespace WiFiServer.Models
-{
-    using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
-    public partial class USERS
+namespace WiFiMap.Models
+{
+    public class USERS
     {
         public int ID { get; set; }
 

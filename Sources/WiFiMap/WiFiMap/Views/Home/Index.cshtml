@@ -4,6 +4,12 @@
 <input id="pac-input" class="controls" type="text" placeholder="Search Box">
 <div id="map"></div>
 <script>
+
+    $.get( "/api/data", function( data ) {
+        console.log("Data Loaded: ");
+        console.log(data);
+    });
+
     var map;
     var citymap = {
         mock1: {

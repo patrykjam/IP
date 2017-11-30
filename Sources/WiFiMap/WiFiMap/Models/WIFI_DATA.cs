@@ -1,6 +1,6 @@
-namespace WiFiServer.Models
+namespace WiFiMap.Models
 {
-    public partial class WIFI_DATA
+    public class WIFI_DATA
     {
         public int ID { get; set; }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.Entity.Migrations;
 using System.Globalization;
 using System.Linq;
 using WiFiServer.Models;
