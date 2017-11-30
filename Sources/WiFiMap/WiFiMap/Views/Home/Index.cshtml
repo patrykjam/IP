@@ -1,68 +1,162 @@
 ﻿@{
     ViewBag.Title = "WiFiMap";
 }
-<input id="pac-input" class="controls" type="text" placeholder="Search Box">
+<input id="pac-input" class="controls form-control" type="text" placeholder="Search:">
 <div id="map"></div>
 <script>
 
-    $.get( "/api/data", function( data ) {
-        console.log("Data Loaded: ");
-        console.log(data);
-    });
-
     var map;
-    var citymap = {
-        mock1: {
-            center: { lat: 50.027524, lng: 19.905225 },
-            range: 25
-        },
-        mock2: {
-            center: { lat: 50.030412, lng: 19.907435 },
-            range: 100
-        }
-    };
+    var shapes = [];
+    const strokeColorRegular = '#0033CC';
+    const fillColorRegular = '#3399FF';
+    const strokeColorFree = '#339933';
+    const fillColorFree = '#00CC66';
 
     function initMap() {
+        var latCent = 50.027524;
+        var lngCent = 19.905225;
+
         map = new google.maps.Map(document.getElementById('map'), {
-            center: { lat: 50.027524, lng: 19.905225 },
+            center: { lat: latCent, lng: lngCent },
             zoom: 16
         });
+
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                map.setCenter({ lat: position.coords.latitude, lng: position.coords.longitude });
+            });
+        } 
 
         // Create the search box and link it to the UI element.
         var input = document.getElementById('pac-input');
         var searchBox = new google.maps.places.SearchBox(input);
         map.controls[google.maps.ControlPosition.TOP].push(input);
 
-        for (var city in citymap) {
-            // Add the circle for this city to the map.
-            var cityCircle = new google.maps.Circle({
-                strokeColor: '#0033CC',
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: '#3399FF',
-                fillOpacity: 0.35,
-                map: map,
-                center: citymap[city].center,
-                radius: citymap[city].range,
-                title: 'WiFi'
-            });
-            var contentString = '<div id="content">' +
-                '<h1 id="firstHeading" class="firstHeading">WIFI</h1>' +
-                '<div id="bodyContent">' +
-                'WiFi info:<br>' +
-                'INFO<br>' + 'INFO<br>' + 'INFO<br>' +
-                '</div>' +
-                '</div>';
+        map.addListener('bounds_changed', function() {
+            searchBox.setBounds(map.getBounds());
+        });
 
-            var infowindow = new google.maps.InfoWindow({
-                content: contentString
-            });
+        var markers = [];
 
-            google.maps.event.addListener(cityCircle, 'click', function (ev) {
-                infowindow.setPosition(ev.latLng); //<-- ev matches what you put ^ (mouse event)
-                infowindow.open(map);
+        searchBox.addListener('places_changed', function() {
+            var places = searchBox.getPlaces();
+
+            if (places.length == 0) {
+                return;
+            }
+
+            // Clear out the old markers.
+            markers.forEach(function(marker) {
+                marker.setMap(null);
+            });
+            markers = [];
+
+            // For each place, get the icon, name and location.
+            var bounds = new google.maps.LatLngBounds();
+            places.forEach(function(place) {
+                if (!place.geometry) {
+                    console.log("Returned place contains no geometry");
+                    return;
+                }
+                var icon = {
+                    url: place.icon,
+                    size: new google.maps.Size(71, 71),
+                    origin: new google.maps.Point(0, 0),
+                    anchor: new google.maps.Point(17, 34),
+                    scaledSize: new google.maps.Size(25, 25)
+                };
+
+                // Create a marker for each place.
+                markers.push(new google.maps.Marker({
+                    map: map,
+                    icon: icon,
+                    title: place.name,
+                    position: place.geometry.location
+                }));
+
+                if (place.geometry.viewport) {
+                    // Only geocodes have viewport.
+                    bounds.union(place.geometry.viewport);
+                } else {
+                    bounds.extend(place.geometry.location);
+                }
+            });
+            map.fitBounds(bounds);
+        });
+
+        var iFrequency = 15000; // expressed in miliseconds
+        var myInterval = 0;
+
+        //// STARTS and Resets the loop if any
+        function startLoop() {
+            if (myInterval > 0) clearInterval(myInterval);
+            myInterval = setInterval(refreshMap, iFrequency);
+        }
+
+
+        function refreshMap() {
+            $.get("/api/data", function (data) {
+
+                wifiLocs = [];
+
+                for (var k = 0; k < shapes.length; k++) {
+                    shapes[k].setMap(null);
+                }
+
+                shapes = [];
+
+                for (var i = 0; i < data.length; i++) {
+                    wifiLocs.push({
+                        center: { lat: data[i].LATITUDE, lng: data[i].LONGITUDE },
+                        range: data[i].MAX_DISTANCE,
+                        title: data[i].SSID,
+                        info: data[i].EXTRA_INFO,
+                        free: data[i].FREE
+                    });
+
+                }
+
+                
+
+                for (var j = 0; j < wifiLocs.length; j++) {
+
+                    var cityCircle = new google.maps.Circle({
+                        strokeColor: wifiLocs[j].free ? strokeColorFree : strokeColorRegular,
+                        strokeOpacity: 0.8,
+                        strokeWeight: 2,
+                        fillColor: wifiLocs[j].free ? fillColorFree : fillColorRegular,
+                        fillOpacity: 0.35,
+                        map: map,
+                        center: wifiLocs[j].center,
+                        radius: wifiLocs[j].range,
+                        title: wifiLocs[j].title,
+                        idx: j
+                    });
+                    shapes.push(cityCircle);
+
+                    var infowindow = new google.maps.InfoWindow({
+                        content: ''
+                    });
+
+                    google.maps.event.addListener(shapes[j], 'click', function (ev) {
+                        infowindow.setContent('<div id="content">' +
+                            '<h1 id="firstHeading" class="firstHeading">' +
+                            wifiLocs[this.idx].title +
+                            '</h1>' +
+                            '<div id="bodyContent">' +
+                            'WiFi info:<br>' +
+                            wifiLocs[this.idx].info +
+                            '</div>' +
+                            '</div>');
+                        infowindow.setPosition(ev.latLng); //<-- ev matches what you put ^ (mouse event)
+                        infowindow.open(map);
+                    });
+                }
             });
         }
+
+        refreshMap();
+        startLoop();
     }
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBa-8oJW9pe46Dx_zXrT1zsWnB-1w7Wszs&libraries=places&callback=initMap" async defer></script>

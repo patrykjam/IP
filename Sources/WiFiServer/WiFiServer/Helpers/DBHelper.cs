@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using WiFiServer.Models;
 
 namespace WiFiServer.Helpers
@@ -130,6 +133,33 @@ namespace WiFiServer.Helpers
                 });
 
             _dbContext.SaveChanges();
+        }
+
+        public USERS Authenticate(string login, string password)
+        {
+            var user = _dbContext.USERS.FirstOrDefault(u => u.LOGIN == login);
+            if (user == null)
+            {
+                return null;
+            }
+            using (SHA512 sha512 = new SHA512Managed())
+            {
+                return user.PASSWORD == BitConverter.ToString(sha512.ComputeHash(Encoding.UTF8.GetBytes(password)))
+                           .Replace("-", "")
+                    ? user
+                    : null;
+            }
+        }
+
+        public string GetDevices()
+        {
+            var str = new StringBuilder();
+            foreach (var el in _dbContext.DEVICES.Select(d => d.DEVICE_ID.TrimEnd()))
+            {
+                str.AppendLine(el.TrimEnd());
+            }
+
+            return str.ToString();
         }
     }
 }

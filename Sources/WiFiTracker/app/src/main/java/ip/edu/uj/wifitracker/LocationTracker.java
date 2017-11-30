@@ -38,7 +38,7 @@ public class LocationTracker implements LocationListener {
 
     @SuppressLint("MissingPermission")
     public void startUpdates() {
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MILISECONDS_BETWEEN_UPDATES, 5, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MILISECONDS_BETWEEN_UPDATES, MIN_DISTANCE, this);
         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (location != null) {
             longitude = location.getLongitude();

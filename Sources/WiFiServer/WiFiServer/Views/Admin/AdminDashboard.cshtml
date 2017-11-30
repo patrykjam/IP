@@ -1,0 +1,53 @@
+﻿@using WiFiServer.Helpers
+@inherits System.Web.Mvc.WebViewPage
+@{
+    var devices = new DbHelper().GetDevices();
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <title>Admin dashboard</title>
+</head>
+<body>
+<form method="post">
+    <div>
+        <label for="DeviceId">Lock device:</label> <br />
+        <input type="text" name="DeviceId" class="form-control" placeholder="DeviceId" required />
+    </div>
+    <div>
+        <input type="checkbox" name="block" value="true" hidden />
+    </div>
+    <div>
+        <label>&nbsp;</label>
+        <input type="submit" value="Submit"  class="submit btn btn-info btn-block" />
+    </div>
+</form>
+<form method="post">
+    <div>
+        <label for="DeviceId">Unblock device:</label> <br />
+        <input type="text" name="DeviceId" class="form-control" placeholder="DeviceId" required />
+    </div>
+    <div>
+        <input type="checkbox" name="block" value="false" hidden />
+    </div>
+    <div>
+        <label>&nbsp;</label>
+        <input type="submit" value="Submit"  class="submit btn btn-info btn-block" />
+    </div>
+</form>
+<h1>Devices: </h1>
+@{ new DbHelper().GetDevices(); }
+
+<textarea id="devicesTextArea" style="width: 333px; height: 222px;" class="form-control"></textarea>
+</body>
+</html>
+
+<script>
+    var dev = `@devices`;
+    console.log(dev);
+    $('#devicesTextArea').val(dev);
+</script>

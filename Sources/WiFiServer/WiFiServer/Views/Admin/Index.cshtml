@@ -1,0 +1,29 @@
+﻿@inherits System.Web.Mvc.WebViewPage
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin access</title>
+</head>
+<body>
+<form method="post" >
+    <fieldset>
+        <div>
+            <label for="Login">Login:</label> <br/>
+            <input type="text" name="Login" value="" required />
+        </div>
+        <div>
+            <label for="Password">Password:</label> <br />
+            <input type="password" name="Password" value="" required />
+        </div>
+        <div>
+            <input type="checkbox" name="login" value="true" hidden />
+        </div>
+        <div>
+            <label>&nbsp;</label>
+            <input type="submit" value="Submit" class="submit" />
+        </div>
+    </fieldset>
+</form>
+</body>
+</html>

@@ -11,4 +11,6 @@
     public string EXTRA_INFO { get; set; }
 
     public double MAX_DISTANCE { get; set; }
+
+    public bool FREE { get; set; }
 }
