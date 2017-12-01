@@ -1,12 +1,5 @@
 ﻿body {
-    padding-top: 50px;
-    padding-bottom: 20px;
-}
-
-/* Set padding to keep content from hitting the edges */
-.body-content {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding-top: 5px;
 }
 
 /* Override the default bootstrap behavior where horizontal description lists 
@@ -25,5 +18,5 @@ textarea {
 
 #map {
     position: relative;
-    height: calc(100vh - 4em - 64px);
+    height: calc(100vh - 1em);
 }

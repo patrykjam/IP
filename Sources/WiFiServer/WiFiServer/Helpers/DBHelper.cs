@@ -164,7 +164,9 @@ namespace WiFiServer.Helpers
         {
             try
             {
-                _dbContext.DEVICES.First(d => d.DEVICE_ID.Trim() == deviceId).BLOCKED = block;
+                _dbContext.DEVICES
+                    .First(d => d.DEVICE_ID.Trim().Equals(deviceId.Trim(), StringComparison.OrdinalIgnoreCase))
+                    .BLOCKED = block;
             }
             catch { /* Wrong deviceId */ }
             _dbContext.SaveChanges();
