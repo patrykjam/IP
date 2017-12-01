@@ -13,41 +13,47 @@
     <title>Admin dashboard</title>
 </head>
 <body>
-<form method="post">
-    <div>
-        <label for="DeviceId">Lock device:</label> <br />
-        <input type="text" name="DeviceId" class="form-control" placeholder="DeviceId" required />
-    </div>
-    <div>
-        <input type="checkbox" name="block" value="true" hidden />
-    </div>
-    <div>
-        <label>&nbsp;</label>
-        <input type="submit" value="Submit"  class="submit btn btn-info btn-block" />
-    </div>
-</form>
-<form method="post">
-    <div>
-        <label for="DeviceId">Unblock device:</label> <br />
-        <input type="text" name="DeviceId" class="form-control" placeholder="DeviceId" required />
-    </div>
-    <div>
-        <input type="checkbox" name="block" value="false" hidden />
-    </div>
-    <div>
-        <label>&nbsp;</label>
-        <input type="submit" value="Submit"  class="submit btn btn-info btn-block" />
-    </div>
-</form>
-<h1>Devices: </h1>
-@{ new DbHelper().GetDevices(); }
-
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/Admin/Logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <form method="post" action="/Admin/Remove">
+        <div>
+            <label for="DeviceId">Lock device:</label> <br />
+            <input type="text" name="DeviceId" class="form-control" placeholder="DeviceId" required />
+        </div>
+        <div>
+            <input type="hidden" id="block" name="block" value="true" />
+        </div>
+        <div>
+            <label>&nbsp;</label>
+            <input type="submit" value="Submit" class="submit btn btn-info btn-block" />
+        </div>
+    </form>
+    <form method="post">
+        <div>
+            <label for="DeviceId">Unblock device:</label> <br />
+            <input type="text" name="DeviceId" class="form-control" placeholder="DeviceId" required />
+        </div>
+        <div>
+            <input type="hidden" id="block" name="block" value="false" />
+        </div>
+        <div>
+            <label>&nbsp;</label>
+            <input type="submit" value="Submit" class="submit btn btn-info btn-block" />
+        </div>
+    </form>
+    <h1>Devices: </h1>
 <textarea id="devicesTextArea" style="width: 333px; height: 222px;" class="form-control"></textarea>
 </body>
 </html>
 
 <script>
     var dev = `@devices`;
-    console.log(dev);
     $('#devicesTextArea').val(dev);
 </script>

@@ -149,7 +149,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\DBHelper.cs" />
-    <Compile Include="Helpers\RequireRouteValuesAttribute.cs" />
     <Compile Include="Models\ALL_DATA.cs" />
     <Compile Include="Models\AUTH_TYPES.cs" />
     <Compile Include="Models\BSSIDS.cs" />

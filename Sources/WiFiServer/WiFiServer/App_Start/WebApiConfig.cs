@@ -10,8 +10,7 @@ namespace WiFiServer
 
             config.Routes.MapHttpRoute(
                 name: "TrackingApi",
-                routeTemplate: "{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
+                routeTemplate: "{controller}"
             );
         }
     }

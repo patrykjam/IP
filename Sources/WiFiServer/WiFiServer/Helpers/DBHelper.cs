@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
@@ -137,7 +136,7 @@ namespace WiFiServer.Helpers
 
         public USERS Authenticate(string login, string password)
         {
-            var user = _dbContext.USERS.FirstOrDefault(u => u.LOGIN == login);
+            var user = _dbContext.USERS.FirstOrDefault(u => u.LOGIN.Equals(login, StringComparison.OrdinalIgnoreCase));
             if (user == null)
             {
                 return null;
@@ -154,12 +153,21 @@ namespace WiFiServer.Helpers
         public string GetDevices()
         {
             var str = new StringBuilder();
-            foreach (var el in _dbContext.DEVICES.Select(d => d.DEVICE_ID.TrimEnd()))
+            foreach (var el in _dbContext.DEVICES)
             {
-                str.AppendLine(el.TrimEnd());
+                str.AppendLine($"{el.DEVICE_ID.TrimEnd()}\t{(el.BLOCKED ? "BLOCKED" : "")}");
             }
-
             return str.ToString();
+        }
+
+        public void ChangeBlockedDeviceStatus(string deviceId, bool block)
+        {
+            try
+            {
+                _dbContext.DEVICES.First(d => d.DEVICE_ID.Trim() == deviceId).BLOCKED = block;
+            }
+            catch { /* Wrong deviceId */ }
+            _dbContext.SaveChanges();
         }
     }
 }
