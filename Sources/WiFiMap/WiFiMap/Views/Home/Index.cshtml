@@ -11,6 +11,7 @@
     const fillColorRegular = '#3399FF';
     const strokeColorFree = '#339933';
     const fillColorFree = '#00CC66';
+    var wifiLocs = [];
 
     function initMap() {
         var latCent = 50.027524;
@@ -84,7 +85,7 @@
             map.fitBounds(bounds);
         });
 
-        var iFrequency = 15000; // expressed in miliseconds
+        var iFrequency = 25000; // expressed in miliseconds
         var myInterval = 0;
 
         //// STARTS and Resets the loop if any
@@ -97,26 +98,51 @@
         function refreshMap() {
             $.get("/api/data", function (data) {
 
-                wifiLocs = [];
+                var newWifiLocs = [];
 
-                for (var k = 0; k < shapes.length; k++) {
-                    shapes[k].setMap(null);
-                }
 
-                shapes = [];
-
-                for (var i = 0; i < data.length; i++) {
-                    wifiLocs.push({
+                for (let i = 0; i < data.length; i++) {
+                    newWifiLocs.push({
                         center: { lat: data[i].LATITUDE, lng: data[i].LONGITUDE },
                         range: data[i].MAX_DISTANCE,
                         title: data[i].SSID,
                         info: data[i].EXTRA_INFO,
                         free: data[i].FREE
                     });
-
                 }
 
-                
+                var change = false;
+
+                if (wifiLocs.length !== newWifiLocs.length) {
+                    change = true;
+                }
+                else
+                {
+                    for (let q = 0; q < wifiLocs.length; q++) {
+                        if (wifiLocs[q].center.lat !== newWifiLocs[q].center.lat ||
+                            wifiLocs[q].center.lng !== newWifiLocs[q].center.lng ||
+                            wifiLocs[q].title !== newWifiLocs[q].title ||
+                            wifiLocs[q].range !== newWifiLocs[q].range) {
+                            change = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!change) {
+                    return;
+                }
+
+                console.log('Refreshing with removal...');
+
+                for (var k = 0; k < shapes.length; k++) {
+                    shapes[k].setMap(null);
+                }
+
+                wifiLocs = newWifiLocs;
+
+                shapes = [];
+
 
                 for (var j = 0; j < wifiLocs.length; j++) {
 
