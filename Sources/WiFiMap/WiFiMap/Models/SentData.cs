@@ -13,4 +13,6 @@
     public double MAX_DISTANCE { get; set; }
 
     public bool FREE { get; set; }
+
+    public string BSSID { get; set; }
 }

@@ -21,7 +21,6 @@ namespace WiFiMap.Controllers
         {
             var list = _dbContext.ALL_DATA.ToList();
             list.RemoveAll(d => d.SSID.Contains("UPC Wi-Free"));
-            var q = DistanceCalc.DistanceBetweenPlaces(48, -122, 49, -121);
             var sentData = new List<SentData>();
             foreach (var bssid in list.Select(d => d.BSSID).Distinct())
             {
@@ -39,10 +38,18 @@ namespace WiFiMap.Controllers
                     MAX_DISTANCE = maxDist > 0.00001 ? maxDist : 0.5,
                     SSID = maxRssiData.SSID,
                     EXTRA_INFO = maxRssiData.AUTH_TYPE,
-                    FREE = !maxRssiData.AUTH_TYPE.Contains("WPA")
+                    FREE = !maxRssiData.AUTH_TYPE.Contains("WPA"),
+                    BSSID = maxRssiData.BSSID
                 });
             }
             return sentData;
         }
+
+        [Route("api/data/free")]
+        public List<SentData> GetFreeWiFis()
+        {
+            return Get().Where(data => data.FREE).ToList();
+        }
+
     }
 }
