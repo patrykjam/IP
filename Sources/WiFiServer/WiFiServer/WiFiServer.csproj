@@ -186,6 +186,7 @@
     <None Include="Properties\PublishProfiles\WiFiServer - Web Deploy.pubxml" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Admin\AdminDashboard.cshtml" />
+    <Content Include="Views\Admin\WrongPassword.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

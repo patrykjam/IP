@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Collections.Generic;
+using System.Web.Mvc;
 using WiFiServer.Helpers;
 
 namespace WiFiServer.Controllers
@@ -22,21 +23,21 @@ namespace WiFiServer.Controllers
             if (!ModelState.IsValid) return View();
             {
                 var user = new DbHelper().Authenticate(Login, Password);
-                if (user == null) return View();
+                if (user == null) return View("WrongPassword");
                 Session["Username"] = user.LOGIN;
                 return View("AdminDashboard");
             }
         }
 
         [HttpPost]
-        public ActionResult Remove(string DeviceId, bool block)
+        public ActionResult Remove(IEnumerable<string> deviceId, bool block)
         {
-            if (Session["Username"] != null)
+            if (Session["Username"] == null) return RedirectToAction("Index");
+            foreach (var device in deviceId)
             {
-                new DbHelper().ChangeBlockedDeviceStatus(DeviceId, block);
-                return View("AdminDashboard");
+                new DbHelper().ChangeBlockedDeviceStatus(device, block);
             }
-            return RedirectToAction("Index");
+            return View("AdminDashboard");
         }
 
         public ActionResult Logout()

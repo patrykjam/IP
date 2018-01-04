@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
@@ -150,14 +152,9 @@ namespace WiFiServer.Helpers
             }
         }
 
-        public string GetDevices()
+        public Dictionary<string, bool> GetDevices()
         {
-            var str = new StringBuilder();
-            foreach (var el in _dbContext.DEVICES)
-            {
-                str.AppendLine($"{el.DEVICE_ID.TrimEnd()}\t{(el.BLOCKED ? "BLOCKED" : "")}");
-            }
-            return str.ToString();
+            return _dbContext.DEVICES.ToDictionary(el => el.DEVICE_ID, el => el.BLOCKED);
         }
 
         public void ChangeBlockedDeviceStatus(string deviceId, bool block)

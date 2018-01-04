@@ -9,7 +9,10 @@
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
+
     <title>Admin dashboard</title>
 </head>
 <body>
@@ -23,37 +26,55 @@
         </div>
     </nav>
     <form method="post" action="/Admin/Remove">
-        <div>
-            <label for="DeviceId">Lock device:</label> <br />
-            <input type="text" name="DeviceId" class="form-control" placeholder="DeviceId" required />
-        </div>
+        Lock device:
+        <select id="toBlock" name="deviceId" multiple="multiple">
+            @{
+                foreach (var device in devices)
+                {
+                    if (!device.Value)
+                    {
+                        <option value="@device.Key">@device.Key</option>
+                    }
+                }
+            }
+        </select>
         <div>
             <input type="hidden" id="block" name="block" value="true" />
         </div>
         <div>
             <label>&nbsp;</label>
-            <input type="submit" value="Submit" class="submit btn btn-info btn-block" />
+            <input type="submit" value="Submit" class="submit btn btn-info" />
         </div>
     </form>
     <form method="post">
-        <div>
-            <label for="DeviceId">Unblock device:</label> <br />
-            <input type="text" name="DeviceId" class="form-control" placeholder="DeviceId" required />
-        </div>
+        Unlock device:
+        <select id="toUnblock" name="deviceId" multiple="multiple">
+            @{
+                foreach (var device in devices)
+                {
+                    if (device.Value)
+                    {
+                        <option value="@device.Key">@device.Key</option>
+                    }
+                }
+            }
+        </select>
         <div>
             <input type="hidden" id="block" name="block" value="false" />
         </div>
         <div>
             <label>&nbsp;</label>
-            <input type="submit" value="Submit" class="submit btn btn-info btn-block" />
+            <input type="submit" value="Submit" class="submit btn btn-info" />
         </div>
     </form>
-    <h1>Devices: </h1>
-<textarea id="devicesTextArea" style="width: 333px; height: 222px;" class="form-control"></textarea>
 </body>
 </html>
 
 <script>
-    var dev = `@devices`;
-    $('#devicesTextArea').val(dev);
+    $('#toBlock').multiselect({
+        includeSelectAllOption: true
+    });
+    $('#toUnblock').multiselect({
+        includeSelectAllOption: true
+    });
 </script>
