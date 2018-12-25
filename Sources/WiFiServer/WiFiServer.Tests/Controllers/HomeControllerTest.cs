@@ -1,6 +1,4 @@
-﻿using System.Web.Mvc;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using WiFiServer.Controllers;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace WiFiServer.Tests.Controllers
 {

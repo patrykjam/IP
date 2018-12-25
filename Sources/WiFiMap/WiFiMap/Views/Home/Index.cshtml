@@ -1,62 +1,322 @@
 ﻿@{
     ViewBag.Title = "WiFiMap";
 }
-<input id="pac-input" class="controls" type="text" placeholder="Search Box">
-<div id="map"></div>
+
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+        <ul class="sidebar-nav">
+            <li class="sidebar-brand">
+                <a href="#">
+                    Wi-Fi Map
+                </a>
+            </li>
+            <li>
+                <table id="filterTable" class="display" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </li>
+        </ul>
+    </div>
+    <!-- /#sidebar-wrapper -->
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+        <button href="#menu-toggle" class="btn btn-info" id="menu-toggle">
+            <span class="glyphicon glyphicon-filter"></span>
+        </button>
+
+        @*<input id="pac-input" class="controls form-control" type="text" placeholder="Search:">*@
+        <div id="map"></div>
+    </div>
+    <!-- /#page-content-wrapper -->
+
+</div>
+
 <script>
-    var map;
-    var citymap = {
-        mock1: {
-            center: { lat: 50.027524, lng: 19.905225 },
-            range: 25
-        },
-        mock2: {
-            center: { lat: 50.030412, lng: 19.907435 },
-            range: 100
+
+    var linkToData = "/api/data";
+    const allData = "/api/data";
+    const freeData = "/api/data/free";
+    var free = false;
+
+    $('#filterTable thead th').each(function () {
+        $(this).html(`<input type="text" style="color:GREY;" placeholder="Search SSID"/> <button id="freeButton" class="btn btn-primary">Free</button><button id="selectButton" class="btn btn-primary">Select all</button><button id="deselectButton" class="btn btn-primary">Deselect all</button>`);
+    });
+
+    document.getElementById("freeButton").onclick = function () {
+        free = !free;
+        if (free) {
+            linkToData = freeData;
+            this.classList.remove('btn-primary');
+            this.classList.add('btn-success');
+        } else {
+            linkToData = allData;
+            this.classList.remove('btn-success');
+            this.classList.add('btn-primary');
         }
+        refreshMap();
     };
 
+    document.getElementById("selectButton").onclick = function () {
+        const checkboxes = document.getElementsByClassName('table-checkbox');
+        for (let j = 0; j < checkboxes.length; j++) {
+            checkboxes[j].checked = true;
+        }
+        refreshFilters();
+    };
+
+    document.getElementById("deselectButton").onclick = function () {
+        const checkboxes = document.getElementsByClassName('table-checkbox');
+        for (let j = 0; j < checkboxes.length; j++) {
+            checkboxes[j].checked = false;
+        }
+        refreshFilters();
+    };
+
+
+
+
+
+    // DataTable
+    var table = $('#filterTable').DataTable({
+        bPaginate: false,
+        bSort: false,
+        bilter: false,
+        "sDom": '<"top">rt<"bottom"lp><"clear">'
+    });
+
+    // Apply the search
+    table.columns().every(function () {
+        var that = this;
+
+        $('input', this.header()).on('keyup change', function () {
+            if (that.search() !== this.value) {
+                that
+                    .search(this.value)
+                    .draw();
+            }
+        });
+    });
+
+    $("#menu-toggle").click(function (e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+
+    var map;
+    var shapes = [];
+    const strokeColorRegular = '#0033CC';
+    const fillColorRegular = '#3399FF';
+    const strokeColorFree = '#339933';
+    const fillColorFree = '#00CC66';
+    var wifiLocs = [];
+
+    function refreshFilters() {
+        const bssids = [];
+        const checkboxes = document.getElementsByClassName('table-checkbox');
+        for (let j = 0; j < checkboxes.length; j++) {
+            if (checkboxes[j].checked)
+                bssids.push(checkboxes[j].value);
+        }
+        for (let k = 0; k < shapes.length; k++) {
+            if (bssids.length === 0) {
+                shapes[k].setVisible(true);
+            }
+            else if ( $.inArray(shapes[k].bssid, bssids) !== -1) {
+                shapes[k].setVisible(true);
+            } else {
+                shapes[k].setVisible(false);
+            }
+        }
+    }
+
+    var iFrequency = 5000; // expressed in miliseconds
+    var myInterval = 0;
+
+    //// STARTS and Resets the loop if any
+    function startLoop() {
+        if (myInterval > 0) clearInterval(myInterval);
+        myInterval = setInterval(refreshMap, iFrequency);
+    }
+
+    function refreshMap() {
+        $.get(linkToData, function (data) {
+
+            const newWifiLocs = [];
+
+
+            for (let i = 0; i < data.length; i++) {
+                newWifiLocs.push({
+                    center: { lat: data[i].LATITUDE, lng: data[i].LONGITUDE },
+                    range: data[i].MAX_DISTANCE,
+                    title: data[i].SSID,
+                    info: data[i].EXTRA_INFO,
+                    free: data[i].FREE,
+                    bssid: data[i].BSSID
+                });
+            }
+
+            var change = false;
+
+            if (wifiLocs.length !== newWifiLocs.length) {
+                change = true;
+            }
+            else {
+                for (let q = 0; q < wifiLocs.length; q++) {
+                    if (wifiLocs[q].center.lat !== newWifiLocs[q].center.lat ||
+                        wifiLocs[q].center.lng !== newWifiLocs[q].center.lng ||
+                        wifiLocs[q].title !== newWifiLocs[q].title ||
+                        wifiLocs[q].range !== newWifiLocs[q].range) {
+                        change = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!change) {
+                return;
+            }
+
+            console.log('Refreshing with removal...');
+
+            table.clear();
+
+            for (let k = 0; k < shapes.length; k++) {
+                shapes[k].setMap(null);
+            }
+
+            wifiLocs = newWifiLocs;
+
+            shapes = [];
+
+            for (let j = 0; j < wifiLocs.length; j++) {
+
+                const cityCircle = new google.maps.Circle({
+                    strokeColor: wifiLocs[j].free ? strokeColorFree : strokeColorRegular,
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: wifiLocs[j].free ? fillColorFree : fillColorRegular,
+                    fillOpacity: 0.35,
+                    map: map,
+                    center: wifiLocs[j].center,
+                    radius: wifiLocs[j].range,
+                    title: wifiLocs[j].title,
+                    idx: j,
+                    bssid: wifiLocs[j].bssid
+                });
+                shapes.push(cityCircle);
+
+                table.row.add([
+                    '<label style="cursor: pointer;"><input type="checkbox" class="table-checkbox" value="' + wifiLocs[j].bssid + '"> ' + wifiLocs[j].title + '</label>'
+                ]);
+
+                var infowindow = new google.maps.InfoWindow({
+                    content: ''
+                });
+                google.maps.event.addListener(shapes[j], 'click', function (ev) {
+                    infowindow.setContent('<div id="content">' +
+                        '<h1 id="firstHeading" class="firstHeading">' +
+                        wifiLocs[this.idx].title +
+                        '</h1>' +
+                        '<div id="bodyContent">' +
+                        'WiFi info:<br>' +
+                        wifiLocs[this.idx].info +
+                        '</div>' +
+                        '</div>');
+                    infowindow.setPosition(ev.latLng); //<-- ev matches what you put ^ (mouse event)
+                    infowindow.open(map);
+                });
+            }
+            table.draw(false);
+            var filters = document.getElementsByClassName('table-checkbox');
+            for (var i = 0; i < filters.length; i++) {
+                filters[i].onclick = refreshFilters;
+            }
+        });
+    }
+
     function initMap() {
+        const latCent = 50.027524;
+        const lngCent = 19.905225;
+
         map = new google.maps.Map(document.getElementById('map'), {
-            center: { lat: 50.027524, lng: 19.905225 },
+            center: { lat: latCent, lng: lngCent },
             zoom: 16
         });
 
-        // Create the search box and link it to the UI element.
-        var input = document.getElementById('pac-input');
-        var searchBox = new google.maps.places.SearchBox(input);
-        map.controls[google.maps.ControlPosition.TOP].push(input);
-
-        for (var city in citymap) {
-            // Add the circle for this city to the map.
-            var cityCircle = new google.maps.Circle({
-                strokeColor: '#0033CC',
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: '#3399FF',
-                fillOpacity: 0.35,
-                map: map,
-                center: citymap[city].center,
-                radius: citymap[city].range,
-                title: 'WiFi'
-            });
-            var contentString = '<div id="content">' +
-                '<h1 id="firstHeading" class="firstHeading">WIFI</h1>' +
-                '<div id="bodyContent">' +
-                'WiFi info:<br>' +
-                'INFO<br>' + 'INFO<br>' + 'INFO<br>' +
-                '</div>' +
-                '</div>';
-
-            var infowindow = new google.maps.InfoWindow({
-                content: contentString
-            });
-
-            google.maps.event.addListener(cityCircle, 'click', function (ev) {
-                infowindow.setPosition(ev.latLng); //<-- ev matches what you put ^ (mouse event)
-                infowindow.open(map);
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                map.setCenter({ lat: position.coords.latitude, lng: position.coords.longitude });
             });
         }
+
+        // Create the search box and link it to the UI element.
+        //const input = document.getElementById('pac-input');
+        //var searchBox = new google.maps.places.SearchBox(input);
+        map.controls[google.maps.ControlPosition.LEFT_TOP].push(document.getElementById('menu-toggle'));
+        //map.controls[google.maps.ControlPosition.TOP].push(input);
+
+        //map.addListener('bounds_changed', function () {
+        //    searchBox.setBounds(map.getBounds());
+        //});
+
+        //var markers = [];
+
+        //searchBox.addListener('places_changed', function () {
+        //    const places = searchBox.getPlaces();
+
+        //    if (places.length === 0) {
+        //        return;
+        //    }
+
+        //    // Clear out the old markers.
+        //    markers.forEach(function (marker) {
+        //        marker.setMap(null);
+        //    });
+        //    markers = [];
+
+        //    // For each place, get the icon, name and location.
+        //    var bounds = new google.maps.LatLngBounds();
+        //    places.forEach(function (place) {
+        //        if (!place.geometry) {
+        //            console.log("Returned place contains no geometry");
+        //            return;
+        //        }
+        //        const icon = {
+        //            url: place.icon,
+        //            size: new google.maps.Size(71, 71),
+        //            origin: new google.maps.Point(0, 0),
+        //            anchor: new google.maps.Point(17, 34),
+        //            scaledSize: new google.maps.Size(25, 25)
+        //        };
+
+        //        // Create a marker for each place.
+        //        markers.push(new google.maps.Marker({
+        //            map: map,
+        //            icon: icon,
+        //            title: place.name,
+        //            position: place.geometry.location
+        //        }));
+
+        //        if (place.geometry.viewport) {
+        //            // Only geocodes have viewport.
+        //            bounds.union(place.geometry.viewport);
+        //        } else {
+        //            bounds.extend(place.geometry.location);
+        //        }
+        //    });
+        //    map.fitBounds(bounds);
+        //});
+
+        refreshMap();
+        startLoop();
     }
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBa-8oJW9pe46Dx_zXrT1zsWnB-1w7Wszs&libraries=places&callback=initMap" async defer></script>

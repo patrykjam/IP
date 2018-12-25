@@ -1,0 +1,80 @@
+﻿@using WiFiServer.Helpers
+@inherits System.Web.Mvc.WebViewPage
+@{
+    var devices = new DbHelper().GetDevices();
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
+
+    <title>Admin dashboard</title>
+</head>
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/Admin/Logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <form method="post" action="/Admin/Remove">
+        Lock device:
+        <select id="toBlock" name="deviceId" multiple="multiple">
+            @{
+                foreach (var device in devices)
+                {
+                    if (!device.Value)
+                    {
+                        <option value="@device.Key">@device.Key</option>
+                    }
+                }
+            }
+        </select>
+        <div>
+            <input type="hidden" id="block" name="block" value="true" />
+        </div>
+        <div>
+            <label>&nbsp;</label>
+            <input type="submit" value="Submit" class="submit btn btn-info" />
+        </div>
+    </form>
+    <form method="post">
+        Unlock device:
+        <select id="toUnblock" name="deviceId" multiple="multiple">
+            @{
+                foreach (var device in devices)
+                {
+                    if (device.Value)
+                    {
+                        <option value="@device.Key">@device.Key</option>
+                    }
+                }
+            }
+        </select>
+        <div>
+            <input type="hidden" id="block" name="block" value="false" />
+        </div>
+        <div>
+            <label>&nbsp;</label>
+            <input type="submit" value="Submit" class="submit btn btn-info" />
+        </div>
+    </form>
+</body>
+</html>
+
+<script>
+    $('#toBlock').multiselect({
+        includeSelectAllOption: true
+    });
+    $('#toUnblock').multiselect({
+        includeSelectAllOption: true
+    });
+</script>

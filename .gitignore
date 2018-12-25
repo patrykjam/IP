@@ -227,3 +227,6 @@ _ReSharper*/
 
 # .NET Core
 **/Properties/launchSettings.json
+.idea
+/Sources/WiFiServer/WiFiServer/Web.config
+/Sources/WiFiMap/WiFiMap/Web.config

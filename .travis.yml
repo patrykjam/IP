@@ -1,0 +1,7 @@
+language: csharp
+jobs:
+  include:
+    - stage: build
+    - script: nuget restore Sources/WiFiServer/WiFiServer.sln
+    - script: nuget restore Sources/WiFiMap/WiFiMap.sln
+script: ls
